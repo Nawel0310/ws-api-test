@@ -1,0 +1,82 @@
+services:
+  # Base de datos MySQL
+  mysql:
+    image: mysql:8.0
+    container_name: ws-api-test-bd-mysql-backend-only
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "${MYSQL_HOST_PORT}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - ws-api-test-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+      interval: 30s
+
+  # phpMyAdmin para MySQL
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: ws-api-test-phpmyadmin-backend-only
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: ${MYSQL_USER}
+      PMA_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "${PHPMYADMIN_PORT}:80"
+    depends_on:
+      - mysql
+    networks:
+      - ws-api-test-network
+
+  # Aplicación Spring Boot
+  app:
+    build: .
+    container_name: ws-api-test-app-backend-only
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      # Base de datos
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+
+
+      # JWT
+      JWT_SECRET: ${JWT_SECRET}
+
+      # Configuración adicional
+      JAVA_OPTS: ${JAVA_OPTS}
+    ports:
+      - "${APP_PORT}:8080"
+    networks:
+      - ws-api-test-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      timeout: 10s
+      retries: 5
+      interval: 30s
+      start_period: 60s
+
+# Volúmenes para persistencia de datos
+volumes:
+  mysql_data:
+    driver: local
+
+# Red personalizada
+networks:
+  ws-api-test-network:
+    driver: bridge
