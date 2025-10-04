@@ -58,6 +58,10 @@ services:
       # JWT
       JWT_SECRET: ${JWT_SECRET}
 
+      # WhatsApp API
+      WHATSAPP_IDENTIFICADOR: ${WHATSAPP_IDENTIFICADOR}
+      WHATSAPP_TOKEN: ${WHATSAPP_TOKEN}
+
       # Configuración adicional
       JAVA_OPTS: ${JAVA_OPTS}
     ports:
