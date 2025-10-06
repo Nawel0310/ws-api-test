@@ -9,17 +9,23 @@ Spring Boot 3.5.6 application for integrating with the WhatsApp Business API (Me
 ## Architecture
 
 Standard Spring Boot layered architecture:
-- **Service Layer**: `src/main/java/com/example/WhatsApp/API/Test/service/`
-  - `ApiWhatsAppService`: Initializes RestClient for WhatsApp Graph API with credentials from application.properties
-- **Package structure**: `controller/`, `entity/`, `repository/`, `service/` directories exist but most are currently empty
+- **Controller Layer**: `ApiWhatsAppController` exposes REST endpoint at `/api/v1/whatsapp/enviar` (POST) that accepts `MessageBodyDTO` (number, message)
+- **Service Layer**: `ApiWhatsAppService` handles WhatsApp API integration
+  - Constructor initializes RestClient with credentials from environment variables (`WHATSAPP_IDENTIFICADOR`, `WHATSAPP_TOKEN`)
+  - `sendMessage()` transforms DTO → `RequestMessage` entity → sends to Graph API → parses `ResponseWhatsapp`
+  - RestClient configured with base URL `https://graph.facebook.com/v17.0/{identificador}/messages`
+- **Entity/DTO packages**: Request/Response models for WhatsApp API communication
+  - `RequestMessage`: Contains `messaging_product`, `to`, `text` (RequestMessageText)
+  - `ResponseWhatsapp`: Parses Graph API response
+  - `MessageBodyDTO`: Controller input (number, message)
 
 ## Configuration
 
-WhatsApp API credentials stored in `src/main/resources/application.properties`:
-- `whatsapp.identificador`: WhatsApp Business Account ID
-- `whatsapp.token`: Access token for Meta Graph API
+WhatsApp API credentials are read from **environment variables** (not application.properties):
+- `WHATSAPP_IDENTIFICADOR`: WhatsApp Business Account ID
+- `WHATSAPP_TOKEN`: Meta Graph API access token
 
-The `ApiWhatsAppService` constructor reads these properties and configures a RestClient pointing to `https://graph.facebook.com/v17.0/{identificador}/messages`.
+These must be set in the environment before running the application.
 
 ## Common Commands
 
@@ -46,12 +52,14 @@ The `ApiWhatsAppService` constructor reads these properties and configures a Res
 
 ## Dependencies
 
-- Spring Boot Data JPA (MySQL connector included)
+- Spring Boot Web (RestClient for HTTP calls)
+- Spring Boot Data JPA + MySQL connector (configured but not yet used)
 - Spring Boot Validation
-- Spring Boot Web (includes RestClient)
-- Lombok (annotation processor configured in pom.xml)
-- Spring Security Test (testing only)
+- Lombok (annotation processing configured in maven-compiler-plugin)
+- Spring Security Test (testing scope only)
 
-## Database
+## Notes
 
-Project configured for MySQL (connector present), but database configuration not yet set in application.properties. JPA entities would go in `entity/` package, repositories in `repository/`.
+- Database configuration not yet implemented despite JPA/MySQL dependencies
+- `ApiWhatsAppService.sendMessage()` has comment "AGREGAR URI PERSONALIZADO" at line 34 - URI parameter is currently empty string
+- Response entity classes (`ResponseWhatsappContact`, `ResponseWhatsappMessage`) exist but aren't fully integrated

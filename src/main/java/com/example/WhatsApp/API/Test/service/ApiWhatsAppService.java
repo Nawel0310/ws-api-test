@@ -2,6 +2,7 @@ package com.example.WhatsApp.API.Test.service;
 import com.example.WhatsApp.API.Test.dto.MessageBodyDTO;
 import com.example.WhatsApp.API.Test.entity.RequestMessage;
 import com.example.WhatsApp.API.Test.entity.RequestMessageText;
+import com.example.WhatsApp.API.Test.entity.ResponseWhatsapp;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

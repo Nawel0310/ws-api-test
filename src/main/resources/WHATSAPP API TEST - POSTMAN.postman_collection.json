@@ -1,0 +1,99 @@
+{
+	"info": {
+		"_postman_id": "af635920-339a-463d-b99a-043f7bc0ac5e",
+		"name": "WHATSAPP API TEST - POSTMAN",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "45036777",
+		"_collection_link": "https://nawel-3409489.postman.co/workspace/Nawel's-Workspace~67d912dd-5bc1-4be1-8fe0-83195012f94f/collection/45036777-af635920-339a-463d-b99a-043f7bc0ac5e?action=share&source=collection_link&creator=45036777"
+	},
+	"item": [
+		{
+			"name": "PRUEBA DE ENVIO",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "EACO0R9trL70BPjf0cBKgKXxlr8lZBG72qswhHUAEGeBhkn70A08jdUTMI5ZBasb8VLZCid1bRkjbX1JirShp7JmZC5TcH8ZCZB9ZCcCrLD3pQYWFmzcm0jsfGdrtFj65aApZAuRkNArei4sNgYajIKLuado5CGKiX7t8FUZCytZBYFbZCFaQklzFkw2dLBTZCZAbgFZAN9uwQRuL8wlVz0LlxNKDqYAKjunXPVQ3UZBVnWzg5VBNwZDZD",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"messaging_product\": \"whatsapp\",\n    \"to\": \"54111526794405\",\n    \"text\": {\n        \"body\": \"hello_world\"\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://graph.facebook.com/v22.0/800489739818004/messages",
+					"protocol": "https",
+					"host": [
+						"graph",
+						"facebook",
+						"com"
+					],
+					"path": [
+						"v22.0",
+						"800489739818004",
+						"messages"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ENVIO LOCAL",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"number\": \"54111526794405\",\n    \"message\": \"Prueba de envio desde Backend con Java y Spring Boot. Sin token en Postman\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/whatsapp/enviar",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"whatsapp",
+						"enviar"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
