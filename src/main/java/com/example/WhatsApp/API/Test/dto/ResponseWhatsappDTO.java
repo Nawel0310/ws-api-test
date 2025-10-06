@@ -1,4 +1,4 @@
-package com.example.WhatsApp.API.Test.entity;
+package com.example.WhatsApp.API.Test.dto;
 
 
 import lombok.AllArgsConstructor;
@@ -10,10 +10,10 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResponseWhatsapp {
+public class ResponseWhatsappDTO {
 
     private String messaging_product;
-    private List<ResponseWhatsappContact> contacts;
-    private List<ResponseWhatsappMessage> messages;
+    private List<ResponseWhatsappContactDTO> contacts;
+    private List<ResponseWhatsappMessageDTO> messages;
 
 }

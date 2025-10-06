@@ -1,8 +1,8 @@
 package com.example.WhatsApp.API.Test.service;
 import com.example.WhatsApp.API.Test.dto.MessageBodyDTO;
-import com.example.WhatsApp.API.Test.entity.RequestMessage;
-import com.example.WhatsApp.API.Test.entity.RequestMessageText;
-import com.example.WhatsApp.API.Test.entity.ResponseWhatsapp;
+import com.example.WhatsApp.API.Test.dto.RequestMessageDTO;
+import com.example.WhatsApp.API.Test.dto.RequestMessageTextDTO;
+import com.example.WhatsApp.API.Test.dto.ResponseWhatsappDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +27,8 @@ public class ApiWhatsAppService {
     }
 
 
-    public ResponseWhatsapp sendMessage(MessageBodyDTO payload) throws JsonProcessingException {
-        RequestMessage request = new RequestMessage("whatsapp", payload.getNumber(), new RequestMessageText(payload.getMessage()));
+    public ResponseWhatsappDTO sendMessage(MessageBodyDTO payload) throws JsonProcessingException {
+        RequestMessageDTO request = new RequestMessageDTO("whatsapp", payload.getNumber(), new RequestMessageTextDTO(payload.getMessage()));
 
         String response = restClient.post()
                 .uri("")//AGREGAR URI PERSONALIZADO
@@ -38,6 +38,6 @@ public class ApiWhatsAppService {
                 .body(String.class);
 
         ObjectMapper obj = new ObjectMapper();
-        return obj.readValue(response, ResponseWhatsapp.class);
+        return obj.readValue(response, ResponseWhatsappDTO.class);
     }
 }

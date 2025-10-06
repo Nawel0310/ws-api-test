@@ -2,7 +2,7 @@ package com.example.WhatsApp.API.Test.controller;
 
 
 import com.example.WhatsApp.API.Test.dto.MessageBodyDTO;
-import com.example.WhatsApp.API.Test.entity.ResponseWhatsapp;
+import com.example.WhatsApp.API.Test.dto.ResponseWhatsappDTO;
 import com.example.WhatsApp.API.Test.service.ApiWhatsAppService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ public class ApiWhatsAppController {
     private final ApiWhatsAppService apiWhatsAppService;
 
     @PostMapping("/enviar")
-    public ResponseWhatsapp enviar(@RequestBody MessageBodyDTO payload) throws JsonProcessingException {
+    public ResponseWhatsappDTO enviar(@RequestBody MessageBodyDTO payload) throws JsonProcessingException {
         return apiWhatsAppService.sendMessage(payload);
     }
 
