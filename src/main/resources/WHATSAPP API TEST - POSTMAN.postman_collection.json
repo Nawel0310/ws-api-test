@@ -94,6 +94,40 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "NOTIFICAR FACTURAS PENDIENTES",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/whatsapp/notificar-facturas",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"whatsapp",
+						"notificar-facturas"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }

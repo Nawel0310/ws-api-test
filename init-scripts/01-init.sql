@@ -2,10 +2,10 @@
 -- Este script se ejecuta automáticamente cuando se crea el contenedor de MySQL
 
 -- Crear la base de datos si no existe
-CREATE DATABASE IF NOT EXISTS ws_api_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS `ws-api-test` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Usar la base de datos
-USE ws_api_test;
+USE `ws-api-test`;
 
 -- Configurar zona horaria
 SET time_zone = '+00:00';
