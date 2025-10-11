@@ -1,15 +1,10 @@
 package com.example.WhatsApp.API.Test.service;
-import com.example.WhatsApp.API.Test.dto.MessageBodyDTO;
-import com.example.WhatsApp.API.Test.dto.NotificacionFacturaResponseDTO;
-import com.example.WhatsApp.API.Test.dto.RequestMessageDTO;
-import com.example.WhatsApp.API.Test.dto.RequestMessageTextDTO;
-import com.example.WhatsApp.API.Test.dto.ResponseWhatsappDTO;
+import com.example.WhatsApp.API.Test.dto.*;
 import com.example.WhatsApp.API.Test.entity.Factura;
 import com.example.WhatsApp.API.Test.entity.Usuario;
 import com.example.WhatsApp.API.Test.repository.UsuarioRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -58,6 +53,18 @@ public class ApiWhatsAppService {
         return obj.readValue(response, ResponseWhatsappDTO.class);
     }
 
+    public ResponseWhatsappDTO sendTemplateMessage(TemplateMessageDTO templateMessage) throws JsonProcessingException {
+        String response = restClient.post()
+                .uri("")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(templateMessage)
+                .retrieve()
+                .body(String.class);
+
+        ObjectMapper obj = new ObjectMapper();
+        return obj.readValue(response, ResponseWhatsappDTO.class);
+    }
+
     public List<NotificacionFacturaResponseDTO> enviarNotificacionFacturasPendientes() {
         List<Usuario> usuarios = usuarioRepository.findAll();
         List<NotificacionFacturaResponseDTO> resultados = new ArrayList<>();
@@ -66,29 +73,47 @@ public class ApiWhatsAppService {
         for (Usuario usuario : usuarios) {
             if (usuario.getFacturas() != null && !usuario.getFacturas().isEmpty()) {
                 try {
-                    // Construir mensaje
-                    StringBuilder mensaje = new StringBuilder();
-                    mensaje.append(String.format("Estimado/a %s %s,\n\n", usuario.getNombre(), usuario.getApellido()));
-                    mensaje.append("Le informamos que tiene las siguientes facturas pendientes de pago:\n\n");
-
+                    // Construir texto de facturas pendientes
+                    StringBuilder facturasTexto = new StringBuilder();
                     BigDecimal total = BigDecimal.ZERO;
                     int contador = 1;
 
                     for (Factura factura : usuario.getFacturas()) {
-                        mensaje.append(String.format("Factura %d:\n", contador++));
-                        mensaje.append(String.format("  - Monto: $%.2f\n", factura.getPrecio()));
-                        mensaje.append(String.format("  - Vencimiento: %s\n\n", factura.getFechaVencimiento().format(formatter)));
+                        if (contador > 1) {
+                            facturasTexto.append(" ");
+                        }
+                        facturasTexto.append(String.format("Factura %d: - Monto: $%.2f - Vencimiento: %s.",
+                                contador++,
+                                factura.getPrecio(),
+                                factura.getFechaVencimiento().format(formatter)));
                         total = total.add(factura.getPrecio());
                     }
 
-                    mensaje.append(String.format("*TOTAL A PAGAR: $%.2f*\n\n", total));
-                    mensaje.append("Para realizar el pago, por favor diríjase al siguiente enlace:\n");
-                    mensaje.append(linkPago);
-                    mensaje.append("\n\nGracias por su atención.");
+                    // Construir parámetros del template
+                    List<TemplateParameterDTO> parameters = new ArrayList<>();
+                    parameters.add(TemplateParameterDTO.text("nombre", usuario.getNombre()));
+                    parameters.add(TemplateParameterDTO.text("apellido", usuario.getApellido()));
+                    parameters.add(TemplateParameterDTO.text("facturas_pendientes", facturasTexto.toString()));
+                    parameters.add(TemplateParameterDTO.text("total_a_pagar", String.format("%.2f", total)));
+
+                    // Crear componente body con los parámetros
+                    TemplateComponentDTO bodyComponent = TemplateComponentDTO.body(parameters);
+
+                    // Crear template
+                    TemplateDTO template = new TemplateDTO(
+                            "factura",
+                            TemplateLanguageDTO.spanishArgentina(),
+                            List.of(bodyComponent)
+                    );
+
+                    // Crear mensaje con template
+                    TemplateMessageDTO templateMessage = new TemplateMessageDTO(
+                            usuario.getNumeroTelefono(),
+                            template
+                    );
 
                     // Enviar mensaje
-                    MessageBodyDTO messageBody = new MessageBodyDTO(usuario.getNumeroTelefono(), mensaje.toString());
-                    sendMessage(messageBody);
+                    sendTemplateMessage(templateMessage);
 
                     // Agregar resultado
                     NotificacionFacturaResponseDTO response = new NotificacionFacturaResponseDTO(
@@ -112,7 +137,7 @@ public class ApiWhatsAppService {
                             usuario.getId(),
                             usuario.getNumeroTelefono(),
                             usuario.getNombre() + " " + usuario.getApellido(),
-                            usuario.getFacturas().size(),
+                            usuario.getFacturas() != null ? usuario.getFacturas().size() : 0,
                             "ERROR",
                             "Error al enviar notificación: " + e.getMessage()
                     );
